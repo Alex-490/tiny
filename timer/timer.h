@@ -7,6 +7,7 @@
 #include <map>
 #include <unordered_map>
 #include <thread>
+#include <condition_variable>
 
 class Task{
 public:
@@ -19,7 +20,7 @@ public:
     //允许拷贝构造么？我猜不允许，因为renwu想想就不能被拷贝
 
     //把renwu设置为无效
-    void setunuseful(){
+    void setUnuseful(){
         alive_=false;
     }
 
@@ -60,7 +61,8 @@ public:
 
     void setUnuse(size_t id){
         Task* tmp=map_[id];
-        tmp->setunuseful();
+        tmp->setUnuseful();
+        cond_.wait_until
     }
 
     func(){
@@ -77,6 +79,7 @@ public:
 private:
     std::thread worker_;//工作线程，实时监测时间
     std::mutex mutex_;
+    std::condition_variable cond_;
     std::unordered_map<size_t,Task*> map_;//通过id快速找到task把里面的alive置为false，也许也可以直接做一个mutilset？每次在执行函数里执行前查下有没有这个id，但好像有一个数学关系，好像也没有，直接把task里的东西改了任何时候都不会比这种更复杂
     std::priority_queue<Task*,std::vector<Task*>,cmp> pq_;
     //size_t minTime_;////那我要minTime_做什么呢？构造函数初始化？肯定不是这样的。应该是用上面的minTime获取一个最小时间被某个一直监控时间的函数比较着
